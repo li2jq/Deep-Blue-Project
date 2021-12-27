@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Session Name="/home/li2jq/Accumulation/shenlan_cplus/Deep-Blue-Project/shenlan_cplus.workspace">
+  <int Value="0" Name="m_selectedTab"/>
+  <wxString Value="/home/li2jq/Accumulation/shenlan_cplus/Deep-Blue-Project/shenlan_cplus.workspace" Name="m_workspaceName"/>
+  <TabInfoArray Name="TabInfoArray">
+    <TabInfo>
+      <wxString Value="/home/li2jq/Accumulation/shenlan_cplus/Deep-Blue-Project/Chap_01/main.cpp" Name="FileName"/>
+      <int Value="63" Name="FirstVisibleLine"/>
+      <int Value="0" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+  </TabInfoArray>
+  <SerializedObject Name="m_breakpoints">
+    <long Value="0" Name="Count"/>
+  </SerializedObject>
+</Session>
