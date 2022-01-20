@@ -4,18 +4,28 @@
 #include <iterator>
 #include <chrono>
 #include <typeinfo>
-
+#include <iomanip>
+#include <cmath>
+#include <limits>
+#include <algorithm>
 using namespace std::chrono;
+
+double double_with_two_decimal_places(double& ans)
+{
+    double res = (int) (ans * 100 + 0.5);
+    return res/100;
+}
 int main()
 {
     srand(time(0));
 
-    std::map<int, int> wpn_ica; // Wrong Problem Number and its correct answer 
+    std::map<int, double> wpn_ica; // Wrong Problem Number and its correct answer 
     std::map<int, double> pn_ut; // Problem number and the used time to answer it
 
     int total_wrong_number(0), total_correct_number(0), total_numbers;
     int difficult_level=-1;
-    double total_time(0), min_time(0);
+    double total_time(0);
+    auto min_time = std::numeric_limits<double>::max();
 
     std::cout << "How many problems do you want play ?" << "\n";
     std::cin >> total_numbers;
@@ -23,17 +33,15 @@ int main()
     std::cout << "What's the difficulty level do you want to try ?" << '\n';
     std::cout << '\t' << "1 (Range within 100 and only addtion/substraction included)" << '\n';
     std::cout << '\t' << "2 (Range within 1000 and only addtion/substraction included)" << '\n';
-    std::cout << '\t' << "3 (Range within 1000 and addtion/substraction/multiplication/division included)" << '\n';
+    std::cout << '\t' << "3 (Range within 1000 and addtion/substraction/multiplication/division(keep answer with two decimal places) included)" << '\n';
     std::cout << "Please input the corresponding difficulty level number: ";
     std::cin  >> difficult_level;  
+
     while (difficult_level != 1 && difficult_level != 2 && difficult_level != 3)
     {
         std::cout << "Invalid difficulty level number! Please input again: ";
         std::cin >> difficult_level;
     }
-    
-
-
 
     for(int i=0; i<total_numbers; i++)
     {   int a,b;
@@ -42,9 +50,9 @@ int main()
         switch (difficult_level)
         {
         case 1:
+            // Addition or substraction within range 100
             a = rand()%100; 
             b = rand()%100;
-            // Addition or substraction
             arithmetic_choice = rand()%2;
             if (arithmetic_choice == 0)
             {
@@ -60,9 +68,9 @@ int main()
             }
             break;
         case 2:
+            // Addition or substraction within range 1000
             a = rand()%1000; 
             b = rand()%1000;
-            // Addition or substraction
             arithmetic_choice = rand()%2;
             if (arithmetic_choice == 0)
             {
@@ -78,9 +86,9 @@ int main()
             }
             break;
         case 3:
+            // Addition, substraction, multiplication or division within range 1000
             a = rand()%1000; 
             b = rand()%1000;
-            // Addition or substraction
             arithmetic_choice = rand()%4;
             if (arithmetic_choice == 0)
             {
@@ -101,33 +109,24 @@ int main()
                 std::cout << "Problem " << i << "\n";
                 std::cout << a << " * " << b << " = ?" << '\n';                
             }
-            //TODO a/b is integer, not accurate
             else
             {   
                 while (b == 0)
                 {
                     b = rand()%1000;
-                    if( b!= 0)
-                        break;
                 }
-                
+
                 ans = double(a) / b;
                 std::cout << "Problem " << i << "\n";
-                std::cout << a << " * " << b << " = ?" << '\n';  
+                std::cout << a << " / " << b << " = ?" << '\n';  
+                ans = double_with_two_decimal_places(ans);
             }
             break;
-        // default:
-        //     std::cout << "Illegal difficulty level choice!" << '\n';
-        //     break;
-        }
-        // int a = rand()%100; 
-        // int b = rand()%100;
-        // int ans = a + b;
-        double usrans;
 
-        // std::cout << "Problem " << i << "\n";
-        // std::cout << a << " + " << b << " = ?" << '\n';
-        
+        }
+
+        double usrans;
+      
         auto start = high_resolution_clock::now();
         std::cin >> usrans;
         auto stop = high_resolution_clock::now();
@@ -135,24 +134,27 @@ int main()
         auto duration = duration_cast<milliseconds>(stop - start);
         
         total_time += duration.count();
+
         // Not Concise
-        if(i==0)
-        {
-            min_time = duration.count();
-        }
-        else
-        {
-            if(duration.count() < min_time)
-            {
-                min_time = duration.count();
-            }
-        }
 
+        min_time = std::min(min_time, double(duration.count()));
+        // if(i==0)
+        // {
+        //     min_time = duration.count();
+        // }
+        // else
+        // {
+        //     if(duration.count() < min_time)
+        //     {
+        //         min_time = duration.count();
+        //     }
+        // }
 
-        // pn_ut.insert(std::pair<int, double> (i, duration.count()));
-        if (usrans != ans)
+        pn_ut.insert(std::pair<int, double> (i, duration.count()));
+
+        if (fabs(usrans - ans) > 0.01)
         {
-            wpn_ica.insert(std::pair<int, int> (i, ans));
+            wpn_ica.insert(std::pair<int, double> (i, ans));
             ++total_wrong_number; 
         }    
     }
@@ -166,12 +168,7 @@ int main()
         std::cout << "The correct answer for Problem " << itr->first << " is " << itr->second << "\n";
     }
 
-    // for(auto itr = pn_ut.begin(); itr != pn_ut.end(); ++itr)
-    // {
-    //     total_time += itr->second;
-    // }
-
     std::cout << "The average time used for " << total_numbers << " Problems is " << total_time/total_numbers << " milliseconds" << '\n';
-    std::cout << "The minimum time is " << min_time << '\n';
+    std::cout << "The minimum time is " << min_time << " milliseconds."<<'\n';
     return 0;
 }
