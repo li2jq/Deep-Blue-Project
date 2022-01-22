@@ -109,11 +109,9 @@ int main(int argc, char* argv[])
         add_2.num_part.push_back(char_int);
     }
 
-    vector<int> res;
+    signed_num res;
+    res.num_part;
     int carry = 0;
-
-    // reverse(add_1.num_part.begin(), add_1.num_part.end());
-    // reverse(add_2.num_part.begin(), add_2.num_part.end());
 
     if (add_1.sign_part == add_2.sign_part)
     {
@@ -142,21 +140,7 @@ int main(int argc, char* argv[])
         reverse(add_1.num_part.begin(), add_1.num_part.end());
         reverse(add_2.num_part.begin(), add_2.num_part.end());
 
-        cout << "The first line number after reverse and add zeros is: " << endl;
-        for (auto i : add_1.num_part)
-        {
-            cout << i;
-        }
-        cout << endl;
-        cout << "Its sign is " << add_1.sign_part << endl;
-
-        cout << "The second line number after reverse and add zeros is: " << endl;
-        for (auto i : add_2.num_part)
-        {
-            cout << i;
-        }
-        cout << endl;
-        cout << "Its sign is " << add_2.sign_part << endl;
+        res.sign_part = add_1.sign_part;
         for (int i = 0  ; i <= cycle_num; i++)
         {
             int remain_num = ( add_1.num_part[i] + add_2.num_part[i] + carry ) % 10;
@@ -167,20 +151,107 @@ int main(int argc, char* argv[])
                     continue;
                 }
             }
-            res.push_back(remain_num);
+            res.num_part.push_back(remain_num);
             carry = ( add_1.num_part[i] + add_2.num_part[i] + carry ) / 10;
-            cout << "add_1 num is " << add_1.num_part[i] << " add_2 num is " << add_2.num_part[i] << " res is " << remain_num << endl;
+            cout << "add_1 num is " << add_1.num_part[i] << " add_2 num is " << add_2.num_part[i] << " res.num_part is " << remain_num << endl;
         }
     }
 
-    reverse(res.begin(), res.end());
+    else // add_1.sign_part != add_2.sign_part
+    {
+        signed_num larger_one;
+        signed_num small_one;
 
-    cout << "Res: " << endl;
-    for (auto i : res)
+        if (add_1.num_part.size() != add_2.num_part.size())
+        {
+            larger_one = add_1.num_part.size() > add_2.num_part.size() ? add_1 : add_2;
+            small_one = add_1.num_part.size() < add_2.num_part.size() ? add_1 : add_2;
+        }
+        else
+        {
+        int flag = 0; // 1 ---> abs(add_1.num) > abs(add_2.num) ||| 0 ---> abs(add_1.num) == abs(add_2.num) ||| -1  ---> abs(add_1.num) < abs(add_2.num)
+            for (int i = 0; i < add_1.num_part.size(); i++)
+            {
+                if (add_1.num_part[i] > add_2.num_part[i])
+                {
+                    flag = 1;
+                    break;
+                }
+                else if (add_1.num_part[i] < add_2.num_part[i])
+                {
+                    flag = -1;
+                    break;
+                }
+                else
+                {
+                    continue;
+                }        
+            }
+
+            // if (flag == 0)
+            // {
+            //     res.num_part.push_back(0);
+            //     res.sign_part = false;
+            // }
+            // else
+            {
+                if (flag == 1)
+                {
+                    larger_one = add_1;
+                    small_one = add_2;
+                }
+                else  
+                {
+                    larger_one = add_2;
+                    small_one = add_1;      
+                }            
+                
+            }
+        }
+        int cycle_num = larger_one.num_part.size();
+        small_one.num_part.insert(small_one.num_part.begin(), cycle_num - small_one.num_part.size(), 0);
+
+        reverse(small_one.num_part.begin(), small_one.num_part.end());
+        reverse(larger_one.num_part.begin(), larger_one.num_part.end());
+
+        cout << "larger.num_part: " << endl;
+        for (auto i : larger_one.num_part)
+        {
+            cout << i;
+        }
+        cout << endl << "larger_one.sign_part: " << larger_one.sign_part << endl;                
+
+        for (auto i : small_one.num_part)
+        {
+            cout << i;
+        }
+        cout << endl << "small_one.sign_part: " << small_one.sign_part << endl;    
+        int borrow_bit = 0;
+        for (int i = 0; i < cycle_num; i++)
+        {
+            if ((larger_one.num_part[i] - borrow_bit) >= small_one.num_part[i])
+            {
+                int sub_res = (larger_one.num_part[i] - borrow_bit) - small_one.num_part[i];
+                res.num_part.push_back(sub_res);
+                borrow_bit = 0;
+            }
+            else
+            {
+                int sub_res = (larger_one.num_part[i] - borrow_bit) + 10 - small_one.num_part[i];
+                res.num_part.push_back(sub_res);
+                borrow_bit = 1;
+            } 
+        }
+
+    }
+    reverse(res.num_part.begin(), res.num_part.end());
+
+    cout << "res.num_part: " << endl;
+    for (auto i : res.num_part)
     {
         cout << i;
     }
-    cout << endl;
+    cout << "res.sign_part: " << res.sign_part << endl;
     
 
     return 0; 
