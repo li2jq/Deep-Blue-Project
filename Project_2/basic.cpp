@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
 
     ifstream inFile;
     inFile.open(argv[1]);
-    // inFile.open("test_case5.txt");
 
     if(!inFile.is_open())
     {
@@ -40,7 +39,10 @@ int main(int argc, char* argv[])
         {
             break;
         }
-        full_line.push_back(line);
+        std::stringstream ss(line);
+        std::string trimmed_string;
+        ss >> trimmed_string;
+        full_line.push_back(trimmed_string);
         ++count;
     }
 
@@ -49,7 +51,7 @@ int main(int argc, char* argv[])
 
     bool found_first_valid_element = false;
 
-    for (int i = 0; i < (full_line[0].size() -1); i++)
+    for (int i = 0; i < full_line[0].size(); i++)
     {
 
         if (full_line[0][0] != '-')
@@ -66,7 +68,6 @@ int main(int argc, char* argv[])
             else
             {
                 found_first_valid_element = true;
-                cout << "The first valid element is " << full_line[0][i] << endl;
             }
         }
 
@@ -74,17 +75,10 @@ int main(int argc, char* argv[])
         add_1.num_part.push_back(char_int);
     }
 
-    // cout << "The first line number is: " << endl;
-    // for (auto i : add_1.num_part)
-    // {
-    //     cout << i;
-    // }
-    // cout << endl;
-    // cout << "Its sign is " << add_1.sign_part << endl;
     
     found_first_valid_element = false;
 
-    for (int i = 0; i < (full_line[1].size() -1); i++)
+    for (int i = 0; i < full_line[1].size(); i++) //TODO super wired!!! seems like there is a /r at the end of this line
     {
 
         if (full_line[1][0] != '-')
@@ -101,7 +95,6 @@ int main(int argc, char* argv[])
             else
             {
                 found_first_valid_element = true;
-                cout << "The first valid element is " << full_line[1][i] << endl;
             }
         }
 
@@ -119,22 +112,16 @@ int main(int argc, char* argv[])
         
         if (cycle_num != add_1.num_part.size())
         {
-            // for( int i = 0; i < (cycle_num - add_1.num_part.size()); i++)
-            // {
-                
-            //     add_1.num_part.insert(add_1.num_part.begin(), 0);
-            // }
-                   add_1.num_part.insert(add_1.num_part.begin(), cycle_num - add_1.num_part.size(), 0);
+
+            add_1.num_part.insert(add_1.num_part.begin(), cycle_num - add_1.num_part.size(), 0);
 
         }
 
         if (cycle_num != add_2.num_part.size())
         {
-            // for( int i = 0; i < (cycle_num - add_2.num_part.size() + 1); i++)
-            // {
-                // cout << "Add zero" << endl;
-                add_2.num_part.insert(add_2.num_part.begin(), cycle_num - add_2.num_part.size(), 0);
-            // }
+
+            add_2.num_part.insert(add_2.num_part.begin(), cycle_num - add_2.num_part.size(), 0);
+            
         }
 
         reverse(add_1.num_part.begin(), add_1.num_part.end());
@@ -153,7 +140,6 @@ int main(int argc, char* argv[])
             }
             res.num_part.push_back(remain_num);
             carry = ( add_1.num_part[i] + add_2.num_part[i] + carry ) / 10;
-            cout << "add_1 num is " << add_1.num_part[i] << " add_2 num is " << add_2.num_part[i] << " res.num_part is " << remain_num << endl;
         }
     }
 
@@ -188,44 +174,27 @@ int main(int argc, char* argv[])
                 }        
             }
 
-            // if (flag == 0)
-            // {
-            //     res.num_part.push_back(0);
-            //     res.sign_part = false;
-            // }
-            // else
+
+            
+            if (flag == 1)
             {
-                if (flag == 1)
-                {
-                    larger_one = add_1;
-                    small_one = add_2;
-                }
-                else  
-                {
-                    larger_one = add_2;
-                    small_one = add_1;      
-                }            
-                
+                larger_one = add_1;
+                small_one = add_2;
             }
+            else  
+            {
+                larger_one = add_2;
+                small_one = add_1;      
+            }            
+                
+            
         }
         int cycle_num = larger_one.num_part.size();
         small_one.num_part.insert(small_one.num_part.begin(), cycle_num - small_one.num_part.size(), 0);
 
         reverse(small_one.num_part.begin(), small_one.num_part.end());
         reverse(larger_one.num_part.begin(), larger_one.num_part.end());
-
-        cout << "larger.num_part: " << endl;
-        for (auto i : larger_one.num_part)
-        {
-            cout << i;
-        }
-        cout << endl << "larger_one.sign_part: " << larger_one.sign_part << endl;                
-
-        for (auto i : small_one.num_part)
-        {
-            cout << i;
-        }
-        cout << endl << "small_one.sign_part: " << small_one.sign_part << endl;    
+  
         int borrow_bit = 0;
         for (int i = 0; i < cycle_num; i++)
         {
@@ -242,17 +211,43 @@ int main(int argc, char* argv[])
                 borrow_bit = 1;
             } 
         }
+        res.sign_part = larger_one.sign_part;
 
     }
+
+    for (int i = (res.num_part.size()-1); i >= 0; --i)
+    {
+        if (res.num_part[i] != 0)
+        {
+            break;
+        }
+        else {
+            res.num_part.pop_back();
+        }
+        
+    }
+
     reverse(res.num_part.begin(), res.num_part.end());
 
-    cout << "res.num_part: " << endl;
+    if (res.num_part.size() == 0)
+    {
+        res.num_part.push_back(0);
+        res.sign_part = false;
+    }
+    
+    string res_str = "";
+
+    if (res.sign_part == true)
+    {
+        res_str += '-';
+    }
     for (auto i : res.num_part)
     {
-        cout << i;
+        char ele = i + '0';
+        res_str += ele;
     }
-    cout << "res.sign_part: " << res.sign_part << endl;
-    
+
+    cout << res_str << endl;
 
     return 0; 
 }
